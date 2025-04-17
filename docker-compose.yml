@@ -1,0 +1,101 @@
+services:
+  postgres:
+    image: postgres:16.1
+    container_name: libreai_pg
+    command: >
+      postgres -c wal_level=logical -c max_replication_slots=10 -c max_wal_senders=10
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: libreai_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+    networks:
+      - libreai_network
+    restart: unless-stopped
+    shm_size: 2g
+
+  ollama:
+    image: ollama/ollama
+    container_name: libreai_ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - libreai_network
+    volumes:
+      - ollama-data:/root/.ollama
+      - ./ollama-config:/etc/ollama:ro
+    deploy:
+      resources:
+        limits:
+          memory: 8G 
+          cpus: '8'
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_NUM_THREADS=8
+    restart: unless-stopped
+    # No healthcheck
+
+  model-puller:
+    image: curlimages/curl:latest
+    depends_on:
+      - ollama
+    entrypoint: [ "sh", "-c", "/pull-models.sh" ]
+    volumes:
+      - ./pull-models.sh:/pull-models.sh:ro
+    networks:
+      - libreai_network
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: libreai_app
+    depends_on:
+      - postgres
+      - ollama
+    ports:
+      - "3000:3000"
+    networks:
+      - libreai_network
+    environment:
+      - BASE_URL=http://localhost
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/libreai_dev?sslmode=disable
+      - GITHUB_CLIENT_ID=Ov23limGCXtvv2xabKgn
+      - GITHUB_CLIENT_SECRET=992d122e740ba9512b1dc5ac22493f7d6ebcd796
+      - OLLAMA_URL=http://ollama:11434
+      - SESSION_SECRET=ab343b0dcf4cd5f509b8e3d8693dd94468640d9c2c5c5aef379d4d620baf9df40e8243bf48843bb0d5510bab935fa17527a440c3bc3e999558e903b40165c556
+      - MAX_PROCS=4
+    volumes:
+      - ./views:/root/views
+      - ./static:/root/static
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.7.6
+    container_name: libreai_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - libreai_network
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  libreai_network:
+    driver: bridge

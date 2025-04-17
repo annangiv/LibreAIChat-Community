@@ -1,0 +1,103 @@
+<!-- Add this to the parent div to enable Alpine -->
+<div x-data="{ consentGiven: false }" class="bg-gray-50 flex flex-col justify-start pt-16 sm:pt-24 px-4 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Privacy Consent
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            We take your privacy seriously
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <form action="/process-consent" method="POST">
+                <div class="space-y-4">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    We'd like to store the following information:
+                                    <ul class="list-disc list-inside mt-2">
+                                        <li>Email: {{.UserInfo.Email }}</li>
+                                        <li>Username: {{ .UserInfo.Username }}</li>
+                                        <li>Profile Picture</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Add this section to explain how you use the data -->
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700 font-medium mb-1">How we'll use this information:</p>
+                                <ul class="list-disc list-inside text-sm text-blue-700">
+                                    <li>To create and manage your account</li>
+                                    <li>To send service-related emails (subscription info, etc.)</li>
+                                    <li>We'll never share your information with third parties</li>
+                                    <li>Your questions and conversations are hashed for privacy</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="consent" name="consent" type="checkbox" 
+                                x-model="consentGiven"
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="consent" class="font-medium text-gray-700">
+                                I consent to storing my information
+                            </label>
+                            <p class="text-gray-500">You can withdraw consent and delete your data at any time from your account settings.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4 mt-6">
+                        <button 
+                            type="submit" 
+                            name="action" 
+                            value="continue" 
+                            :disabled="!consentGiven"
+                            :class="consentGiven 
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                : 'bg-gray-300 text-white cursor-not-allowed'"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+                        >
+                            Continue
+                        </button>
+                        <button 
+                            type="submit" 
+                            name="action" 
+                            value="cancel" 
+                            formaction="/auth/cancel"
+                            class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                    
+                    <p class="mt-2 text-xs text-center text-gray-500">
+                        By continuing, you also agree to our 
+                        <a href="/privacy" class="text-blue-600 hover:text-blue-500">Privacy Policy</a> and 
+                        <a href="/terms" class="text-blue-600 hover:text-blue-500">Terms of Service</a>.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

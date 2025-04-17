@@ -1,0 +1,430 @@
+<!-- views/ask.html -->
+<div class="max-w-3xl mx-auto">
+  <h1 class="text-3xl font-bold mb-6 mt-6 text-center gradient-text">Ask AI</h1>
+
+  <!-- Error message container -->
+  <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 mb-4"></div>
+
+  <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+    <p class="text-sm text-blue-700">
+      <span class="font-medium">{{.QuestionsRemaining}}</span> of <span>{{.QuestionsLimit}}</span> questions remaining today
+    </p>
+  </div>
+
+  {{ if eq .UserTier "premium" }}
+    <h1>Premium Tier</h1>
+  {{ else }}
+    <h1>Free Tier</h1>
+  {{ end }}
+
+  {{if .HasQuota}}
+    <div class="bg-white rounded-lg shadow-md p-5 mb-6">
+      <form id="ask-form">
+        <div class="mb-4">
+          <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Select a model:</label>
+          <select name="model" id="model" class="w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+            {{range .ModelGroups}}
+              <optgroup label="{{.Label}}">
+                {{range .Options}}
+                  <option value="{{.Identifier}}" {{if eq .Identifier "tinyllama:latest"}}selected{{end}}>{{.Name}} - {{.Description}}</option>
+                {{end}}
+              </optgroup>
+            {{end}}
+          </select>
+          
+          
+          <!-- Add a tooltip to explain when models are disabled -->
+          {{if ne .UserTier "premium"}}
+          <p class="text-sm text-gray-600 mt-1 flex items-center">
+            <svg class="h-4 w-4 text-gray-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Medium models are available with <a href="/pricing" class="text-blue-600 font-medium hover:underline">Premium Plan</a>
+          </p>
+          {{end}}
+          <p class="text-xs text-gray-500 mt-1">Models are listed from smallest to largest. Smaller models (top of list) respond faster.</p>
+        </div>
+
+        <div class="mb-4">
+          <label for="prompt" class="block text-sm font-medium text-gray-700 mb-1">Your Question:</label>
+          <input type="text" name="prompt" id="prompt" required placeholder="Ask something..." class="w-full border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none" />
+        </div>
+
+        <button type="submit" class="ask-button hover:opacity-90 text-white px-4 py-3 rounded-md font-semibold mt-2 w-full flex items-center justify-center cursor-pointer">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          Ask
+        </button>
+      </form>
+    </div>
+
+    <div id="loading" class="flex items-center text-blue-500 my-4 hidden">
+      <span class="animate-spin inline-block w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full mr-2"></span>
+      <span>Thinking...</span>
+    </div>    
+
+    <div class="mt-4">
+      <div id="answer" class="bg-white border rounded-md shadow p-4 min-h-[120px] whitespace-pre-wrap text-gray-800">
+        Your answer will appear here...
+      </div>
+    </div>
+  {{else}}
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+      <p class="text-red-700">
+        You've reached your daily question limit. 
+        <a href="/pricing" class="underline font-medium">Upgrade your plan</a> for more questions.
+      </p>
+    </div>
+  {{end}}
+
+  <div class="flex items-center text-sm text-gray-600 space-x-4 mt-4">
+    <div class="tooltip relative">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>No Data Stored</span>
+      </div>
+      <div class="tooltip-text">
+        Your questions and AI responses are never stored. 
+        Once the answer is generated, it only exists in your browser. 
+        We are committed to complete data privacy.
+      </div>
+    </div>
+  
+    <div class="tooltip relative">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span>AI Limitations</span>
+      </div>
+      <div class="tooltip-text">
+        AI-generated responses may contain inaccuracies. 
+        Always verify critical information independently. 
+        Use these responses as a starting point, not definitive truth.
+      </div>
+    </div>
+  </div>
+
+<style>
+  /* Add this style to your HTML */
+  select#model {
+    -webkit-appearance: menulist;
+    appearance: menulist;
+  }
+  
+  select#model option {
+    padding: 4px;
+  }
+  
+  /* Firefox */
+  @-moz-document url-prefix() {
+    select#model {
+      scrollbar-width: thin;
+      max-height: 300px;
+    }
+  }
+  
+  /* Edge, Chrome, Safari */
+  @media screen and (-webkit-min-device-pixel-ratio:0) {
+    select#model {
+      overflow: hidden;
+    }
+    
+    select#model:focus {
+      overflow: auto;
+    }
+  }
+
+  #answer {
+    line-height: 1.6;
+    font-size: 0.95rem;
+    background-color: #fafafa;
+    border-color: #e0e0e0;
+  }
+
+  .ask-button {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .ask-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+
+  select#model {
+    transition: all 0.3s ease;
+  }
+
+  select#model:focus {
+    border-color: #3b82f6;
+    ring-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .tooltip {
+    position: relative;
+    cursor: pointer;
+  }
+  .tooltip-text {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    max-width: 250px;
+    width: max-content;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .tooltip-text.active {
+    display: block;
+  }
+  .tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+
+</style>
+<script>
+  const form = document.getElementById("ask-form");
+  const modelSelect = document.getElementById("model");
+  const promptInput = document.getElementById("prompt");
+  const answerBox = document.getElementById("answer");
+  const loading = document.getElementById("loading");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    answerBox.textContent = "";
+    loading.classList.remove("hidden"); // ✅ Show spinner immediately
+
+    const ws = new WebSocket("ws://" + window.location.host + "/ws/ollama");
+
+    ws.onopen = () => {
+      const data = {
+        model: modelSelect.value,
+        prompt: promptInput.value,
+        stream: true,
+      };
+      ws.send(JSON.stringify(data));
+    };
+
+    let firstChunk = true;
+
+    ws.onmessage = (event) => {
+      if (firstChunk) {
+        loading.classList.add("hidden");
+        firstChunk = false;
+      }
+      answerBox.textContent += event.data;
+    };
+
+    ws.onerror = (err) => {
+      console.error("WebSocket error:", err);
+      answerBox.textContent = "⚠️ Error reaching model.";
+      loading.classList.add("hidden");
+    };
+
+    ws.onclose = () => {
+      loading.classList.add("hidden");
+    };
+  });
+
+  document.getElementById('prompt').addEventListener('input', function() {
+    // Limit input length to prevent extremely long queries
+    this.value = this.value.slice(0, 500);
+  });
+
+  
+  form.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      form.dispatchEvent(new Event('submit'));
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Target the select element
+    const selectElement = document.getElementById('model');
+    
+    // Create a custom style for the select
+    const style = document.createElement('style');
+    style.textContent = `
+      #model {
+        -webkit-appearance: menulist;
+        appearance: menulist;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Create a new custom select overlay
+    selectElement.addEventListener('mousedown', function(e) {
+      // Prevent the default dropdown from showing
+      e.preventDefault();
+      
+      // Create and position a custom dropdown
+      const currentValue = this.value;
+      const rect = this.getBoundingClientRect();
+      
+      // Create custom dropdown
+      const customDropdown = document.createElement('div');
+      customDropdown.style.position = 'absolute';
+      customDropdown.style.top = (rect.bottom) + 'px';
+      customDropdown.style.left = rect.left + 'px';
+      customDropdown.style.width = rect.width + 'px';
+      customDropdown.style.maxHeight = '300px'; // Show about 6-7 options
+      customDropdown.style.overflowY = 'auto';
+      customDropdown.style.backgroundColor = 'white';
+      customDropdown.style.border = '1px solid #ddd';
+      customDropdown.style.borderRadius = '4px';
+      customDropdown.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+      customDropdown.style.zIndex = '1000';
+      
+      // Process optgroups and options
+      Array.from(this.children).forEach(child => {
+        if (child.tagName === 'OPTGROUP') {
+          // Create optgroup header
+          const optgroupHeader = document.createElement('div');
+          optgroupHeader.textContent = child.label;
+          optgroupHeader.style.padding = '8px 12px';
+          optgroupHeader.style.fontWeight = 'bold';
+          optgroupHeader.style.backgroundColor = '#f5f5f5';
+          optgroupHeader.style.color = '#666';
+          optgroupHeader.style.fontSize = '0.875rem';
+          customDropdown.appendChild(optgroupHeader);
+          
+          // Add options from this optgroup
+          Array.from(child.children).forEach(option => {
+            const optItem = document.createElement('div');
+            optItem.textContent = option.text;
+            optItem.style.padding = '8px 12px 8px 20px'; // Indented
+            optItem.style.cursor = 'pointer';
+            
+            if (option.value === currentValue) {
+              optItem.style.backgroundColor = '#f0f9ff';
+            }
+            
+            optItem.addEventListener('mouseover', function() {
+              this.style.backgroundColor = '#f0f9ff';
+            });
+            
+            optItem.addEventListener('mouseout', function() {
+              if (option.value !== selectElement.value) {
+                this.style.backgroundColor = '';
+              }
+            });
+            
+            optItem.addEventListener('click', function() {
+              selectElement.value = option.value;
+              customDropdown.remove();
+              
+              // Trigger change event
+              const event = new Event('change');
+              selectElement.dispatchEvent(event);
+            });
+            
+            customDropdown.appendChild(optItem);
+          });
+        } else if (child.tagName === 'OPTION') {
+          // Handle direct options that aren't in an optgroup
+          const optItem = document.createElement('div');
+          optItem.textContent = child.text;
+          optItem.style.padding = '8px 12px';
+          optItem.style.cursor = 'pointer';
+          
+          if (child.value === currentValue) {
+            optItem.style.backgroundColor = '#f0f9ff';
+          }
+          
+          optItem.addEventListener('mouseover', function() {
+            this.style.backgroundColor = '#f0f9ff';
+          });
+          
+          optItem.addEventListener('mouseout', function() {
+            if (child.value !== selectElement.value) {
+              this.style.backgroundColor = '';
+            }
+          });
+          
+          optItem.addEventListener('click', function() {
+            selectElement.value = child.value;
+            customDropdown.remove();
+            
+            // Trigger change event
+            const event = new Event('change');
+            selectElement.dispatchEvent(event);
+          });
+          
+          customDropdown.appendChild(optItem);
+        }
+      });
+      
+      document.body.appendChild(customDropdown);
+      
+      // Handle clicking outside
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!customDropdown.contains(e.target) && e.target !== selectElement) {
+          customDropdown.remove();
+          document.removeEventListener('click', closeDropdown);
+        }
+      });
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const modelSelect = document.getElementById('model');
+    const userTier = "{{.UserTier}}"; 
+    
+    if (userTier !== "premium") {
+      // If the currently selected option is disabled, select the first enabled option
+      if (modelSelect.selectedOptions[0].disabled) {
+        const firstEnabled = modelSelect.querySelector('option:not([disabled])');
+        if (firstEnabled) {
+          firstEnabled.selected = true;
+        }
+      }
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const tooltips = document.querySelectorAll('.tooltip');
+    
+    tooltips.forEach(tooltip => {
+      const tooltipText = tooltip.querySelector('.tooltip-text');
+      
+      // Toggle tooltip on click
+      tooltip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        tooltipText.classList.toggle('active');
+        
+        // Close other open tooltips
+        tooltips.forEach(other => {
+          if (other !== tooltip) {
+            other.querySelector('.tooltip-text').classList.remove('active');
+          }
+        });
+      });
+      
+      // Close tooltip when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!tooltip.contains(e.target)) {
+          tooltipText.classList.remove('active');
+        }
+      });
+    });
+  });
+</script>

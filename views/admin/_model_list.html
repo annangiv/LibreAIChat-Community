@@ -1,0 +1,31 @@
+{{range .Models}}
+<div class="bg-white shadow-md rounded-lg p-5 flex items-center justify-between hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+  <div class="flex-grow">
+    <div class="flex items-center space-x-3">
+      <h3 class="font-bold text-lg text-gray-800">{{.Name}}</h3>
+      <span class="px-2 py-1 rounded-full text-xs font-medium 
+        {{if eq .Category "small"}}bg-green-100 text-green-800
+        {{else if eq .Category "medium"}}bg-yellow-100 text-yellow-800
+        {{else}}bg-blue-100 text-blue-800{{end}}">
+        {{.Category}}
+      </span>
+    </div>
+    <p class="text-gray-500 text-sm mt-1">{{.Description}}</p>
+  </div>
+  <div class="flex items-center space-x-3">
+    <form hx-post="/admin/models/{{.ID}}/toggle" hx-target="#model-table" class="m-0">
+      <button 
+        class="px-3 py-1.5 rounded-md text-sm font-medium 
+          {{if .IsActive}}
+            bg-green-500 hover:bg-green-600 text-white
+          {{else}}
+            bg-gray-400 hover:bg-gray-500 text-white
+          {{end}} 
+          transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2"
+      >
+        {{if .IsActive}}Active{{else}}Inactive{{end}}
+      </button>
+    </form>
+  </div>
+</div>
+{{end}}

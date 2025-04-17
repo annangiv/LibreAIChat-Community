@@ -1,0 +1,4 @@
+:80 {
+    # Basic reverse proxy to your app
+    reverse_proxy app:3000
+}

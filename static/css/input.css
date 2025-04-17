@@ -1,0 +1,13 @@
+/* Main CSS file with Tailwind CSS 4.0 configuration */
+@import "tailwindcss";
+@theme {
+  --font-sans: "Montserrat", "sans-serif";
+  --color-primary-100: oklch(0.97 0.04 250);
+  --color-primary-200: oklch(0.92 0.08 250);
+  --color-primary-300: oklch(0.87 0.12 250);
+  --color-primary-400: oklch(0.82 0.16 250);
+  --color-primary-500: oklch(0.77 0.20 250);
+  --color-primary-600: oklch(0.67 0.18 250);
+  --color-secondary-500: oklch(0.77 0.20 350);
+  --ease-transition: cubic-bezier(0.3, 0, 0, 1);
+}

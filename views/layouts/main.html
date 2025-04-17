@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="LibreAIChat: Private, open-source AI chat with multiple models. Powered by local, privacy-first technology.">
+    <meta name="keywords" content="AI chat, open-source AI, private AI, local AI models, no tracking">
+
+    <meta property="og:title" content="LibreAIChat - Private AI Conversations">
+    <meta property="og:description" content="AI chat that respects your privacy">
+    <meta property="og:image" content="/static/og-image.png">
+
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="/static/img/logo-dark.png" as="image">
+
+    <title>{{.Title}} - LibreAIChat</title>
+    <link rel="stylesheet" href="/static/css/output.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+    <link rel="preload" href="/static/logo-dark.png" as="image">
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" defer></script>
+    <script defer data-domain="libreaichat.com" src="https://plausible.io/js/script.js"></script>
+    <script defer>
+    window.addEventListener("load", function(){
+        window.cookieconsent.initialise({
+        "palette": {
+            "popup": {
+            "background": "#1E40AF",
+            "text": "#ffffff"
+            },
+            "button": {
+            "background": "#3B82F6",
+            "text": "#ffffff"
+            }
+        },
+        "position": "bottom-right",
+        "content": {
+            "message": "We use cookies to enhance your browsing experience and provide personalized services.",
+            "dismiss": "Got it!",
+            "link": "Learn more",
+            "href": "/privacy"
+        }
+        })
+    });
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+    
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+    
+        main {
+            flex: 1;
+        }
+    
+        .gradient-bg {
+            background: linear-gradient(to right, #3b82f6, #6366f1);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(to right, #3b82f6, #6366f1);
+        }
+        .ask-button {
+            background: linear-gradient(to right, #3b82f6, #6366f1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <header class="bg-white shadow sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex items-center justify-between">
+            <div class="flex items-center space-x-8">
+                <a href="/" class="flex items-center hover:opacity-90 transition">
+                    <img src="/static/img/logo-dark.png"
+                            alt="LibreAIChat Logo"
+                            class="h-6 w-auto transition-opacity duration-200 group-hover:opacity-80" />
+                </a>
+                
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
+                    <a href="/community" class="text-gray-700 hover:text-blue-600 font-medium">Community</a>
+                </nav>
+            </div>
+            
+            <div hx-get="/me" hx-trigger="load" hx-swap="outerHTML">
+                Loading...
+            </div>
+        </div>
+        
+        <!-- Mobile navigation menu -->
+        <div class="md:hidden border-t border-gray-200 mt-2">
+            <div class="flex justify-center space-x-8 py-3">
+                <a href="/about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
+                <a href="/community" class="text-gray-700 hover:text-blue-600 font-medium">Community</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto mt-10 px-4 py-8">
+        {{embed}}
+    </main>
+
+    <footer class="bg-gray-100 py-10 mt-16">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <div class="flex justify-center space-x-4 mb-4">
+                <a href="/privacy" class="text-gray-500 hover:text-blue-600 transition">Privacy Policy</a>
+                <a href="/terms" class="text-gray-500 hover:text-blue-600 transition">Terms of Service</a>
+            </div>
+            <p class="text-gray-600 mb-4">
+                AI Conversations Made Simple -- Accessible Anywhere
+            </p>
+            <p class="text-sm text-gray-500">
+                © 2025 LibreAIChat. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

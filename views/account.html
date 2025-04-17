@@ -1,0 +1,146 @@
+<!-- views/account.html -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold mb-4">My Account</h1>
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div class="flex-shrink-0">
+                <img src="{{.User.AvatarURL}}" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random&color=fff&size=96'" 
+                alt="Profile" class="w-24 h-24 rounded-full">
+            </div>
+            <div class="flex-1">
+                <h2 class="text-xl font-bold">{{.User.Name}}</h2>
+                <p class="text-gray-600">{{.User.Email}}</p>
+                <p class="mt-2 text-sm text-gray-500">Member since {{.User.CreatedAtFormatted}}</p>
+                
+                <div class="mt-4">
+                    <a href="/logout" class="text-red-600 hover:text-red-800 font-medium text-sm">Log out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Usage Stats -->
+<div class="mb-8">
+    <h2 class="text-xl font-semibold mb-4">Usage Statistics</h2>
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4 border border-gray-100 rounded-lg">
+                <h3 class="text-gray-500 text-sm font-medium">Questions Today</h3>
+                <p class="text-3xl font-bold gradient-text">{{.Stats.QuestionsToday}}</p>
+                <p class="text-sm text-gray-500">of {{.User.QuestionsLimit}} limit</p>
+            </div>
+            
+            <div class="text-center p-4 border border-gray-100 rounded-lg">
+                <h3 class="text-gray-500 text-sm font-medium">Questions This Month</h3>
+                <p class="text-3xl font-bold gradient-text">{{.Stats.QuestionsThisMonth}}</p>
+            </div>
+            
+            <div class="text-center p-4 border border-gray-100 rounded-lg">
+                <h3 class="text-gray-500 text-sm font-medium">Total Questions</h3>
+                <p class="text-3xl font-bold gradient-text">{{.Stats.QuestionsTotal}}</p>
+            </div>
+        </div>
+        
+        <div class="mt-6">
+            <h3 class="text-lg font-medium mb-3">Daily Limit</h3>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="gradient-bg h-4 rounded-full" style="width: {{.Stats.LimitPercentage}}%"></div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">{{.Stats.QuestionsRemaining}} questions remaining today</p>
+        </div>
+    </div>
+</div>
+
+<!-- Model Usage -->
+<div>
+    <h2 class="text-xl font-semibold mb-4">Favorite Models</h2>
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="border-b">
+                        <th class="text-left py-3 px-4 text-gray-600 text-sm font-medium">Model</th>
+                        <th class="text-right py-3 px-4 text-gray-600 text-sm font-medium">Usage Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Stats.ModelUsage}}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-3 px-4 text-sm">{{.ModelName}}</td>
+                        <td class="py-3 px-4 text-sm text-right">{{.Count}}</td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="2" class="py-4 text-center text-gray-500">No model usage data yet</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="mt-8 bg-white shadow rounded-lg p-6">
+    <h2 class="text-xl font-semibold mb-4 text-red-600">Danger Zone</h2>
+    <div class="border border-red-200 rounded-lg p-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-medium text-red-700">Delete Account</h3>
+                <p class="text-sm text-gray-600">Permanently delete your account and all associated data</p>
+            </div>
+            <!-- Button to open modal -->
+            <button 
+                id="delete-account-btn"
+                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+            >
+                Delete Account
+            </button>
+        </div>
+
+        <!-- Modal for confirmation -->
+        <div 
+            id="delete-account-modal" 
+            class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden flex items-center justify-center"
+        >
+            <div class="bg-white p-6 rounded-lg max-w-md w-full">
+                <h2 class="text-xl font-bold mb-4 text-red-600">Confirm Account Deletion</h2>
+                <p class="mb-4 text-gray-700">
+                    Are you sure you want to delete your account? This action cannot be undone.
+                </p>
+        
+                <div class="flex space-x-4">
+                    <form method="POST" action="/delete-account" class="flex-1">
+                        <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition">
+                            Yes, Delete My Account
+                        </button>
+                    </form>
+
+                    <!-- Button to close modal -->
+                    <button 
+                        id="cancel-delete-btn"
+                        class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const openBtn = document.getElementById('delete-account-btn');
+        const modal = document.getElementById('delete-account-modal');
+        const cancelBtn = document.getElementById('cancel-delete-btn');
+
+        openBtn.addEventListener('click', function () {
+            modal.classList.remove('hidden');
+        });
+
+        cancelBtn.addEventListener('click', function () {
+            modal.classList.add('hidden');
+        });
+    });
+</script>
