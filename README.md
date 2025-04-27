@@ -85,3 +85,6 @@ Fork it and have fun 🛠.
 📘 License
 
 MIT License – Free to use, modify, and deploy for commercial or personal projects.
+
+🏷️ Tags for discoverability:
+opensource • self-hosted • ai-chat • ollama • chatgpt-alternative • go-fiber • htmx • tailwindcss • docker • privacy-first
