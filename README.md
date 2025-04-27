@@ -1,46 +1,51 @@
-✅ Minimal, Privacy-First AI Chat UI (LibreAIChat Community)
+# ✅ Minimal Open Source AI Chat (LibreAIChat Community)
 
-LibreAIChat Community is a self-hosted, open-source AI chat UI for running open models like Mistral, Phi, and LLaMA 3 via Ollama.
+LibreAIChat Community is a self-hostable version of LibreAIChat -- an AI chat UI that runs open-source models via Ollama. It's designed to be simple, fast, and privacy-respecting -- no billing, no tracking, and no complex setup.
 
-Built with Go Fiber and HTMX, designed to be:
+## 🚀 Features
 
-Simple (easy Docker setup)
-Fast (lightweight backend)
-Privacy-respecting (no tracking, no billing)
-🚫 No cloud lock-in. 🚫 No complex setup. 🚫 No nonsense.
+- ✅ Clean Go Fiber + HTMX frontend
+- ✅ GitHub OAuth login (optional)
+- ✅ Docker Compose setup with:
+  - PostgreSQL
+  - Ollama
+  - Caddy (reverse proxy)
+- ✅ Automatically pulls models on boot
+- ✅ No Stripe, no billing logic
+- ✅ Fully local and lightweight
 
-🚀 Features
+## 📦 Requirements
 
-✅ Clean UI with Go Fiber + HTMX + TailwindCSS
-✅ Real-time streaming responses
-✅ GitHub OAuth login (optional)
-✅ Docker Compose setup with:
-PostgreSQL
-Ollama
-Caddy (reverse proxy with HTTPS)
-✅ Auto-pulls models on boot (Mistral, Phi, etc.)
-✅ Fully local – No Stripe, no billing, your data stays yours
-✅ Lightweight & fast – No GPUs required (CPU-compatible models available)
-📦 Requirements
+- Docker + Docker Compose
+- GitHub OAuth app (optional)
 
-Docker + Docker Compose
-(Optional) GitHub OAuth app for login
-⚙️ Quickstart
+## ⚙️ Quickstart
 
 Clone the repo:
+
+```bash
 git clone https://github.com/LibreAIChat/community.git
 cd community
+
 Copy the example env:
+
 cp .env.example .env
-Edit .env with your GitHub OAuth keys (or leave them blank to skip OAuth).
-🐳 Start with Docker Compose:
+
+Edit .env with your GitHub OAuth keys or leave them blank to skip OAuth.
+🐳 Start with Docker Compose
+
 docker compose up --build
+
 This will:
 
-Start PostgreSQL at localhost:15432
-Start Ollama and preload models via pull-models.sh
-Run LibreAIChat at http://localhost:3000
-Serve through Caddy at http://localhost
+    Start PostgreSQL at localhost:15432
+
+    Start Ollama and preload models via pull-models.sh
+
+    Run the LibreAIChat app at http://localhost:3000
+
+    Serve through Caddy at http://localhost
+
 🛠 Example .env
 
 MAX_PROCS=4
@@ -51,40 +56,39 @@ BASE_URL=http://localhost:3000
 # Optional GitHub OAuth
 GITHUB_CLIENT_ID=your_client_id
 GITHUB_CLIENT_SECRET=your_client_secret
+
 🔄 Auto-Pull Models
 
-The pull-models.sh script auto-pulls your preferred models (like phi, mistral, gemma).
+The pull-models.sh script will auto-pull your preferred models like phi, gemma, or mistral.
 
-Add or edit models directly in the script to customize what loads.
+## 💾 Adding Models
 
-💾 Adding Models to the Database
+To add a new model to your database, use the following SQL:
 
-Insert new models into PostgreSQL:
-
+```sql
 INSERT INTO models (name, identifier, description, category, required_tier, is_active, created_at, updated_at) 
 VALUES ('Qwen', 'qwen2.5:0.5b', 'Quick & efficient responses', 'small', 'free', true, NOW(), NOW());
-Customize identifiers and descriptions as needed!
 
-🌐 Caddy (Reverse Proxy & HTTPS)
 
-Caddy handles reverse proxy and HTTPS (if needed).
-Edit the Caddyfile to:
+You can edit it to pull more models.
 
-Change ports
-Enable TLS
-Customize domains
+🌐 Caddy (Reverse Proxy)
+Caddy is used for easy HTTPS and reverse proxying.
+
+Edit Caddyfile to customize ports or enable TLS.
 🤝 Contributing
 
-PRs welcome! Want to:
+PRs welcome! Want to add:
 
-Add new models?
-Build local chat history?
-Add usage stats?
-Fork it and have fun 🛠.
+    New models?
+
+    Local chat history?
+
+    Usage stats?
+
+Fork and go wild 🛠
+
 
 📘 License
 
-MIT License – Free to use, modify, and deploy for commercial or personal projects.
-
-🏷️ Tags for discoverability:
-opensource • self-hosted • ai-chat • ollama • chatgpt-alternative • go-fiber • htmx • tailwindcss • docker • privacy-first
+MIT. Use it freely for commercial or personal projects.
